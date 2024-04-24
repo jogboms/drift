@@ -1,7 +1,20 @@
-## 2.17.0-dev
+## 2.18.0-dev
+
+- Adds a new interface for writing most simple statements without manually creating
+  select statements and expressions.
+  For a detailed description, see the [documentation website](https://drift.simonbinder.eu/docs/getting-started/manager/).
+- Add `AggregateFunctionExpression` to write custom [aggregate function](https://www.sqlite.org/lang_aggfunc.html)
+  invocations in the Dart query builder.
+- The `json_group_array` and `jsonb_group_array` functions now contain an `orderBy`
+  and `filter` parameter.
+
+## 2.17.0
 
 - Adds `companion` entry to `DataClassName` to override the name of the
   generated companion class.
+- Add the `TypeConverter.extensionType` factory to create type converters for
+  extension types.
+- Fix invalid SQL syntax being generated for `BLOB` literals on postgres.
 
 ## 2.16.0
 

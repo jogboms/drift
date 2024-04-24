@@ -200,16 +200,16 @@ class ElementSerializer {
   }
 
   Map<String, Object?> _serializeColumnType(ColumnType type) {
-    final custom = type.custom;
-
-    return {
-      if (custom != null)
-        'custom': {
-          'dart': _serializeType(custom.dartType),
-          'expression': custom.expression.toJson(),
-        }
-      else
-        'builtin': type.builtin.name,
+    return switch (type) {
+      ColumnDriftType() => {
+          'builtin': type.builtin.name,
+        },
+      ColumnCustomType(:final custom) => {
+          'custom': {
+            'dart': _serializeType(custom.dartType),
+            'expression': custom.expression.toJson(),
+          }
+        },
     };
   }
 
@@ -226,6 +226,7 @@ class ElementSerializer {
       'clientDefaultCode': column.clientDefaultCode?.toJson(),
       'defaultArgument': column.defaultArgument?.toJson(),
       'overriddenJsonName': column.overriddenJsonName,
+      'referenceName': column.referenceName,
       'documentationComment': column.documentationComment,
       'constraints': [
         for (final constraint in column.constraints)
@@ -773,6 +774,7 @@ class ElementDeserializer {
           ? AnnotatedDartCode.fromJson(json['defaultArgument'] as Map)
           : null,
       overriddenJsonName: json['overriddenJsonName'] as String?,
+      referenceName: json['referenceName'] as String?,
       documentationComment: json['documentationComment'] as String?,
       constraints: [
         for (final rawConstraint in json['constraints'] as List)

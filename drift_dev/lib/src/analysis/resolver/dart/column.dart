@@ -344,7 +344,7 @@ class ColumnParser {
             .apply(getter.name.lexeme);
     ColumnType columnType;
 
-    final helper = await _resolver.resolver.driver.loadKnownTypes();
+    final helper = _resolver.resolver.driver.knownTypes;
 
     if (foundStartMethod == _startCustom) {
       final expression = remainingExpr.argumentList.arguments.single;
@@ -457,7 +457,6 @@ class ColumnParser {
       customConstraints: foundCustomConstraint,
       sourceForCustomConstraints: customConstraintSource,
     ));
-
     return PendingColumnInformation(
       DriftColumn(
         sqlType: columnType,
@@ -472,6 +471,7 @@ class ColumnParser {
         documentationComment: docString,
         constraints: foundConstraints,
         customConstraints: foundCustomConstraint,
+        referenceName: _readReferenceName(element),
       ),
       referencesColumnInSameTable: referencesColumnInSameTable,
     );
@@ -505,6 +505,22 @@ class ColumnParser {
     if (object == null) return null;
 
     return object.computeConstantValue()!.getField('key')!.toStringValue();
+  }
+
+  String? _readReferenceName(Element getter) {
+    final annotations = getter.metadata;
+    final object = annotations.firstWhereOrNull((e) {
+      final value = e.computeConstantValue();
+      final valueType = value?.type;
+
+      return valueType is InterfaceType &&
+          isFromDrift(valueType) &&
+          valueType.element.name == 'ReferenceName';
+    });
+
+    if (object == null) return null;
+
+    return object.computeConstantValue()!.getField('name')!.toStringValue();
   }
 
   Future<List<DriftColumnConstraint>> _driftConstraintsFromCustomConstraints({
